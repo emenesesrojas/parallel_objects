@@ -1,0 +1,14 @@
+mainmodule pi {
+
+	readonly CProxy_Master mainProxy;
+
+	mainchare Master {
+		entry Master(CkArgMsg *m);
+		entry void addContribution(int numInside, int numTrials);
+	};
+  
+	chare Worker {
+		entry Worker(int numTrials);
+	};
+
+};
