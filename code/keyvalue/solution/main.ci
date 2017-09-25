@@ -1,0 +1,25 @@
+mainmodule main {
+
+	readonly CProxy_Main mainProxy;
+	readonly CProxy_KeyValueStore kvstoreProxy;
+	readonly CProxy_KeyValueClient kvclientProxy;
+	readonly int N;
+	readonly int M;
+	readonly int K;
+
+	mainchare Main {
+		entry Main(CkArgMsg *m);
+		entry [reductiontarget] void finish();
+	};
+
+	array [1D] KeyValueClient {
+		entry KeyValueClient();
+		entry void response(int refnum, int value);
+		entry void run();
+	};
+
+	array [1D] KeyValueStore { 
+		entry KeyValueStore(void); 
+		entry void request(int refnum, int k, int reqIdx);	
+	};
+};
