@@ -1,0 +1,34 @@
+mainmodule ParticleExercise {
+
+  include "Particle.h";
+
+  readonly CProxy_Main mainProxy;
+  readonly CProxy_Cell cellProxy;
+  readonly CProxy_ParticleGroup particleGroupProxy;
+  readonly int elementsPerCell;
+  readonly int cellDimension;
+
+  mainchare Main {
+    entry Main(CkArgMsg* m);
+    entry [reductiontarget] void printAVG(int average);    
+    entry [reductiontarget] void printMAX(int max);
+    entry [reductiontarget] void printAVGperproc(int average);    
+    entry [reductiontarget] void printMAXperproc(int max);
+    entry [reductiontarget] void donestep(int iter);
+    entry void done();
+  };
+
+  array [2D] Cell {
+    entry Cell(void);
+    entry void updateNeighbor(int iter, std::vector<Particle> incoming);
+    entry void ResumeFromSync();
+    entry void run();
+  };
+
+  group ParticleGroup {
+    entry ParticleGroup();
+    entry void printStatistics(int iteration);
+    entry void collectNumParticles(int iter, int p);
+  };
+
+};
