@@ -1,0 +1,13 @@
+mainmodule main {
+
+	readonly CProxy_Main mainProxy;
+
+	mainchare Main {
+		entry Main(CkArgMsg *m);
+	};
+
+	array [1D] Container {
+		entry Container();
+	};
+
+};

@@ -7,11 +7,13 @@ OBJS = particle.o
 all: particle
 
 particle: $(OBJS)
-	$(CHARMC) -O3 -language charm++ -module CommonLBs -o particle $(OBJS)
+	$(CHARMC) -language charm++ -module CommonLBs -o particle $(OBJS)
 
 particle.decl.h: particle.ci
 	$(CHARMC)  particle.ci
 
+trace: $(OBJS)
+	$(CHARMC) -language charm++ -module CommonLBs -tracemode projections -o particle $(OBJS)
 clean:
 	rm -f *.decl.h *.def.h conv-host *.o particle charmrun *.sts *.gz *.projrc *.topo *.out
 

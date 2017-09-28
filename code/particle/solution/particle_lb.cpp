@@ -9,7 +9,6 @@
 #define NEIGHBORS 4
 
 #define LB_FREQ 10
-#define CP_FREQ 20
 
 /*readonly*/ CProxy_Main mainProxy;
 /*readonly*/ CProxy_Cell cellProxy;
@@ -28,19 +27,11 @@ public:
 	ParticleGroup(){
 		particles_per_processor.resize(ITERATIONS+1, 0);
 	};
-	
-	// Migration constructor (for checkpointing)
-    ParticleGroup(CkMigrateMessage* m) : CBase_ParticleGroup(m) {}
 
 	// Function to write particles per processor in each iteration
     void collectNumParticles(int iter, int p){
         particles_per_processor[iter] += p;
 	};
-
-	// PUP function for a group
-	void pup(PUP::er &p) {
-		p | particles_per_processor;
-	}
 	
 	// Funtion to print out statistics
 	void printStatistics(int iter) {
@@ -78,26 +69,21 @@ public:
 
 		cellProxy.run();
     }
-
-	// Migration constructor    
-    Main(CkMigrateMessage* m) : CBase_Main(m) {}
-
-	void pup(PUP::er &p) {}
-
+    
 	//reduction functions printAVG & printMAX
 	void printAVG(int result){
-		CkPrintf("AVG per chare: %d\n", (result)/(cellDimension*cellDimension));
+		CkPrintf("AVG per chare: %d  \n", (result)/(cellDimension*cellDimension));
 	}
 	void printMAX(int result){
-		CkPrintf("MAX per chare: %d\n", result);
+		CkPrintf("MAX per chare: %d\n ", result);
 	}
     
 	//reduction functions printAVGperproc & printMAXperproc
 	void printAVGperproc(int result){
-		CkPrintf("AVG per proc: %d\n", (result)/(CkNumPes()));
+		CkPrintf("AVG per proc: %d  \n", (result)/(CkNumPes()));
 	}
 	void printMAXperproc(int result){
-		CkPrintf("MAX per proc: %d\n", result);
+		CkPrintf("MAX per proc: %d\n ", result);
 	}
 	
 	// Function to finish execution
@@ -110,15 +96,9 @@ public:
 	}
 
 	// Function after finishing one step
-    void donestep(int iter) {
-		CkPrintf("FINISH ITERATION %d\n", iter);
+    void donestep(int iter){
 		particleGroupProxy.printStatistics(iter);
-		if(iter % CP_FREQ == 0) {
-			CkCallback cb(CkIndex_Cell::run(), cellProxy);
-			CkStartCheckpoint("log", cb);
-		} else {
-			cellProxy.run();
-		}
+		cellProxy.run();
 	}
 };
 
@@ -205,8 +185,8 @@ public:
 		contribute(sizeof(int), &numberParticles, CkReduction::max_int, CkCallback(CkReductionTarget(Main, printMAX), mainProxy));
 		contribute(sizeof(int), &numberParticles, CkReduction::sum_int, CkCallback(CkReductionTarget(Main, printAVG), mainProxy));
        
-		// checking for checkpointing and load balancing
-		if(iteration % LB_FREQ == 0) {
+		// checking for load balancing
+		if((iteration)%LB_FREQ == 1 && iteration != 1) {
 			AtSync(); 
 		} else {
 			//CkPrintf("CELL %d %d %d\n",thisIndex.x,thisIndex.y,iteration);
