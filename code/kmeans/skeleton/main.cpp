@@ -16,8 +16,8 @@ class Main : public CBase_Main
 public:
 	Main(CkArgMsg *m) {
 		mainProxy = thisProxy;
-		if (m->argc < 6) {
-			ckout << "ERROR, usage " << m->argv[0] << " <chares> <data points per chare> <data dimensions> <iterations> <balance frequency>" << endl;
+		if (m->argc < 7) {
+			ckout << "ERROR, usage " << m->argv[0] << " <chares> <data points per chare> <data dimensions> <k> <iterations> <balance frequency>" << endl;
 			CkExit();
 		}
 
